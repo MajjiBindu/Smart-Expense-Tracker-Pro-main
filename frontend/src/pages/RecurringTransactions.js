@@ -2,49 +2,13 @@ import React, { useState, useEffect } from "react";
 import Modal from "../components/ui/Modal";
 import { AiOutlineEdit, AiOutlineDelete, AiOutlinePlus } from "react-icons/ai";
 
-// // Mock Initial Data
-// const [] = [
-//   {
-//     id: "1",
-//     title: "Netflix Subscription",
-//     amount: 649,
-//     frequency: "Monthly",
-//     nextDate: new Date(Date.now() - 86400000).toISOString(),
-//     category: "Fun",
-//     isActive: true,
-//   }, // Overdue
-//   {
-//     id: "2",
-//     title: "Car Insurance",
-//     amount: 3500,
-//     frequency: "Yearly",
-//     nextDate: new Date(Date.now() + 86400000 * 5).toISOString(),
-//     category: "Vehicle",
-//     isActive: true,
-//   },
-//   {
-//     id: "3",
-//     title: "Gym Membership",
-//     amount: 1200,
-//     frequency: "Monthly",
-//     nextDate: new Date(Date.now() + 86400000 * 12).toISOString(),
-//     category: "Other",
-//     isActive: false,
-//   },
-//   {
-//     id: "4",
-//     title: "Internet Bill",
-//     amount: 999,
-//     frequency: "Monthly",
-//     nextDate: new Date(Date.now() + 86400000 * 2).toISOString(),
-//     category: "Other",
-//     isActive: true,
-//   },
-// ];
-
 const RecurringTransactions = () => {
+
+  // NEW: get userId
+  const userId = localStorage.getItem("userId") || "guest";
+
   const [recurringData, setRecurringData] = useState(() => {
-    const saved = localStorage.getItem("recurring_tx");
+    const saved = localStorage.getItem(`recurring_tx_${userId}`);
     return saved ? JSON.parse(saved) : [];
   });
 
@@ -58,9 +22,10 @@ const RecurringTransactions = () => {
     nextDate: new Date().toISOString().substring(0, 10),
   });
 
+  // UPDATED: save per user
   useEffect(() => {
-    localStorage.setItem("recurring_tx", JSON.stringify(recurringData));
-  }, [recurringData]);
+    localStorage.setItem(`recurring_tx_${userId}`, JSON.stringify(recurringData));
+  }, [recurringData, userId]);
 
   const handleToggle = (id) => {
     setRecurringData((prev) =>
@@ -149,7 +114,6 @@ const RecurringTransactions = () => {
     };
   };
 
-  // Extract upcoming active payments for cards
   const upcomingCards = [...recurringData]
     .filter((tx) => tx.isActive)
     .sort((a, b) => new Date(a.nextDate) - new Date(b.nextDate))
