@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
+import { getCurrentUserId } from "../utils/getCurrentUser";
+import { getUserStorageKey } from "../utils/storageHelper";
 
 const Settings = () => {
   const [user, setUser] = useState({ username: "User", email: "" });
 
   // NEW: get userId
-  const storedUser = JSON.parse(localStorage.getItem("User"));
-  const userId = storedUser?._id;
+
+  const userId = getCurrentUserId();
 
   const [settings, setSettings] = useState(() => {
-    const saved = localStorage.getItem(`user_settings_${userId}`);
+    const saved = localStorage.getItem(getUserStorageKey("user_settings"));
     return saved
       ? JSON.parse(saved)
       : {
@@ -38,7 +40,10 @@ const Settings = () => {
     e.preventDefault();
 
     // UPDATED: save per user
-    localStorage.setItem(`user_settings_${userId}`, JSON.stringify(settings));
+    localStorage.setItem(
+      getUserStorageKey("user_settings"),
+      JSON.stringify(settings),
+    );
 
     toast.success("Settings saved successfully!");
   };
