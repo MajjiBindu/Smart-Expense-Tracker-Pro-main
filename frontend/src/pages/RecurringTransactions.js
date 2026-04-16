@@ -3,9 +3,9 @@ import Modal from "../components/ui/Modal";
 import { AiOutlineEdit, AiOutlineDelete, AiOutlinePlus } from "react-icons/ai";
 
 const RecurringTransactions = () => {
-
   // NEW: get userId
-  const userId = localStorage.getItem("userId") || "guest";
+  const user = JSON.parse(localStorage.getItem("User"));
+  const userId = user?._id;
 
   const [recurringData, setRecurringData] = useState(() => {
     const saved = localStorage.getItem(`recurring_tx_${userId}`);
@@ -24,7 +24,10 @@ const RecurringTransactions = () => {
 
   // UPDATED: save per user
   useEffect(() => {
-    localStorage.setItem(`recurring_tx_${userId}`, JSON.stringify(recurringData));
+    localStorage.setItem(
+      `recurring_tx_${userId}`,
+      JSON.stringify(recurringData),
+    );
   }, [recurringData, userId]);
 
   const handleToggle = (id) => {

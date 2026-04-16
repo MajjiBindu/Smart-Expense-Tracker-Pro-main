@@ -31,8 +31,10 @@ function Signup() {
       console.log(response);
       toast.success("Registered Successfully!!");
       // SAVE USER BUDGET
+      const userKey = username; // temporary identifier before login
+
       localStorage.setItem(
-        "user_settings",
+        `user_settings_${userKey}`,
         JSON.stringify({
           monthlyBudget: Number(budget),
           currency: "INR",

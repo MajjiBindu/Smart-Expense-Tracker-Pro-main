@@ -5,19 +5,10 @@ const { error, success } = require("../utils/handler");
 
 const createExpense = async (req, res) => {
   try {
-    let {
-      amount,
-      category,
-      date,
-      userId,
-      usersid,
-      title,
-      type,
-      paymentMethod,
-      note,
-    } = req.body;
+    let { amount, category, date, userId, title, type, paymentMethod, note } =
+      req.body;
 
-    const finalUserId = userId || usersid;
+    const finalUserId = userId;
 
     if (!amount || !category || !date || !finalUserId) {
       return res.send(error(400, "Required fields missing"));
@@ -54,9 +45,15 @@ const deleteExpense = async (req, res) => {
 
 const getAllExpenses = async (req, res) => {
   try {
-    const userId = req.body.userId || req.body.usersid;
+    const { userId } = req.body;
 
-    const expenses = await expenseModel.find({ userId }).sort({ date: -1 });
+    if (!userId) {
+      return res.send(error(400, "UserId is required"));
+    }
+
+    const expenses = await expenseModel
+      .find({ userId: userId })
+      .sort({ date: -1 });
 
     return res.send(success(200, expenses));
   } catch (e) {
@@ -66,7 +63,7 @@ const getAllExpenses = async (req, res) => {
 
 const getSummary = async (req, res) => {
   try {
-    const userId = req.body.userId || req.body.usersid;
+    const userId = req.body.userId || req.body.userId;
 
     const expenses = await expenseModel.find({ userId });
 
@@ -96,7 +93,7 @@ const getSummary = async (req, res) => {
 
 const getRecentExpenses = async (req, res) => {
   try {
-    const userId = req.body.userId || req.body.usersid;
+    const userId = req.body.userId || req.body.userId;
 
     const recent = await expenseModel
       .find({ userId })
@@ -119,7 +116,7 @@ const getRecentExpenses = async (req, res) => {
 
 const getCategoryExpense = async (req, res) => {
   try {
-    const userId = req.body.userId || req.body.usersid;
+    const userId = req.body.userId || req.body.userId;
 
     const categoryData = await expenseModel.aggregate([
       {
@@ -144,7 +141,7 @@ const getCategoryExpense = async (req, res) => {
 
 const getMonthlyExpenses = async (req, res) => {
   try {
-    const userId = req.body.userId || req.body.usersid;
+    const userId = req.body.userId || req.body.userId;
 
     const monthlyData = await expenseModel.aggregate([
       {

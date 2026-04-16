@@ -25,7 +25,9 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   // Settings
-  const userSettings = JSON.parse(localStorage.getItem("user_settings")) || {
+  const userSettings = JSON.parse(
+    localStorage.getItem(`user_settings_${userdata._id}`),
+  ) || {
     monthlyBudget: 0,
     currency: "INR",
   };
@@ -52,13 +54,7 @@ const Home = () => {
     }
 
     const data = await getUserExpenses(userdata._id);
-
-    // Ensure only this user's expenses are loaded
-    const filteredExpenses = (data || []).filter(
-      (exp) => exp.usersid === userdata._id,
-    );
-
-    setUserexp(filteredExpenses);
+      setUserexp(data || []);
 
     setTimeout(() => setIsLoading(false), 800); // Simulate realistic loading
   };
@@ -70,7 +66,7 @@ const Home = () => {
   const handleAddSubmit = async (e) => {
     e.preventDefault();
     await createExpense({
-      usersid: userdata._id,
+      userId: userdata._id,
       amount: Number(formData.amount),
       category: formData.category,
       date: formData.date.toISOString(),

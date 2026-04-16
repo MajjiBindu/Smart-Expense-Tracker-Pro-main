@@ -5,7 +5,8 @@ const Settings = () => {
   const [user, setUser] = useState({ username: "User", email: "" });
 
   // NEW: get userId
-  const userId = localStorage.getItem("userId") || "guest";
+  const storedUser = JSON.parse(localStorage.getItem("User"));
+  const userId = storedUser?._id;
 
   const [settings, setSettings] = useState(() => {
     const saved = localStorage.getItem(`user_settings_${userId}`);
