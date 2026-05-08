@@ -6,7 +6,9 @@ const loginController = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await userModel.findOne({ email });
+    const user = await userModel.findOne({
+      email: email.trim().toLowerCase()
+    });
 
     if (!user) {
       return res.send(error(404, "User not found"));
@@ -18,7 +20,13 @@ const loginController = async (req, res) => {
       return res.send(error(401, "Invalid credentials"));
     }
 
-    return res.send(success(200, user));
+    const userData = {
+      _id: user._id,
+      username: user.username,
+      email: user.email
+    };
+
+return res.send(success(200, userData));
   } catch (err) {
     return res.send(error(500, err.message));
   }
@@ -29,11 +37,15 @@ const signupContorller = async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
-    if (!username || !email || !password) {
-      return res.send(error(400, "All fields required"));
-    }
+    const normalizedEmail = email.trim().toLowerCase();
 
-    const existingUser = await userModel.findOne({ email });
+    const existingUser = await userModel.findOne({ email: normalizedEmail });
+
+    await userModel.create({
+      username,
+      email: normalizedEmail,
+      password: hashedPassword
+    });
     if (existingUser) {
       return res.send(error(409, "User already exists"));
     }
@@ -52,8 +64,8 @@ const signupContorller = async (req, res) => {
   }
 };
 
-const logoutController =async (req,res) => {
-
+const logoutController = async (req,res) => {
+  return res.send(success(200, "Logged out successfully"));
 }
 
 module.exports = {

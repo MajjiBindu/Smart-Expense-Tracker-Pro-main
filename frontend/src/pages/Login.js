@@ -59,27 +59,31 @@ function Login() {
           <p className="text-slate-400">Welcome back! Please login to your account.</p>
         </div>
 
-        <form onSubmit={submitForm} className="space-y-6">
+        <form onSubmit={submitForm} autoComplete="off" className="space-y-6">
           <div className="space-y-2">
             <label className="text-sm font-medium text-slate-300 ml-1">Email Address</label>
-            <input 
-              type="email"
-              placeholder="you@example.com" 
-              onChange={(e) => setEmail(e.target.value)} 
-              className="premium-input" 
-              required
-            />
+            <input
+  type="email"
+  name="email"
+  autoComplete="off"
+  placeholder="you@example.com"
+  onChange={(e) => setEmail(e.target.value)}
+  className="premium-input"
+  required
+/>
           </div>
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-slate-300 ml-1">Password</label>
-            <input 
-              type="password"
-              placeholder="••••••••" 
-              onChange={(e) => setPassword(e.target.value)} 
-              className="premium-input" 
-              required
-            />
+            <input
+  type="password"
+  name="password"
+  autoComplete="new-password"
+  placeholder="••••••••"
+  onChange={(e) => setPassword(e.target.value)}
+  className="premium-input"
+  required
+/>
             <div className="flex justify-end mt-2">
               <span className="text-xs text-brand-primary cursor-pointer hover:underline">Forgot password?</span>
             </div>
