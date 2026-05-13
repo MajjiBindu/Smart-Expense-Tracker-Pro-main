@@ -1,7 +1,14 @@
-const Notification = require("../db/notificationModel");
-exports.updateSettings = async (req, res) => {
+import Notification from "../db/notificationModel.js";
+
+export const updateSettings = async (req, res) => {
   try {
-    const { userId, reminderEnabled, reminderType, reminderTime, monthlyReportEnabled } = req.body;
+    const {
+      userId,
+      reminderEnabled,
+      reminderType,
+      reminderTime,
+      monthlyReportEnabled,
+    } = req.body;
 
     const settings = await Notification.findOneAndUpdate(
       { userId },
@@ -9,20 +16,19 @@ exports.updateSettings = async (req, res) => {
         reminderEnabled,
         reminderType,
         reminderTime,
-        monthlyReportEnabled
+        monthlyReportEnabled,
       },
-      { upsert: true, new: true }
+      { upsert: true, new: true },
     );
 
     res.status(200).json({
       status: "success",
-      message: settings
+      message: settings,
     });
-
   } catch (error) {
     res.status(500).json({
       status: "failed",
-      message: error.message
+      message: error.message,
     });
   }
 };

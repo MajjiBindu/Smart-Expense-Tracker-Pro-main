@@ -1,13 +1,13 @@
-const userModel = require('../db/userModel')
-const { error, success } = require('../utils/handler')
-const bcrypt = require("bcryptjs");
+import userModel from "../db/userModel.js";
+import { error, success } from "../utils/handler.js";
+import bcrypt from "bcryptjs";
 
-const loginController = async (req, res) => {
+export const loginController = async (req, res) => {
   try {
     const { email, password } = req.body;
 
     const user = await userModel.findOne({
-      email: email.trim().toLowerCase()
+      email: email.trim().toLowerCase(),
     });
 
     if (!user) {
@@ -23,17 +23,16 @@ const loginController = async (req, res) => {
     const userData = {
       _id: user._id,
       username: user.username,
-      email: user.email
+      email: user.email,
     };
 
-return res.send(success(200, userData));
+    return res.send(success(200, userData));
   } catch (err) {
     return res.send(error(500, err.message));
   }
 };
 
-
-const signupContorller = async (req, res) => {
+export const signupContorller = async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
@@ -41,11 +40,6 @@ const signupContorller = async (req, res) => {
 
     const existingUser = await userModel.findOne({ email: normalizedEmail });
 
-    await userModel.create({
-      username,
-      email: normalizedEmail,
-      password: hashedPassword
-    });
     if (existingUser) {
       return res.send(error(409, "User already exists"));
     }
@@ -54,7 +48,7 @@ const signupContorller = async (req, res) => {
 
     await userModel.create({
       username,
-      email,
+      email: normalizedEmail,
       password: hashedPassword,
     });
 
@@ -64,12 +58,6 @@ const signupContorller = async (req, res) => {
   }
 };
 
-const logoutController = async (req,res) => {
+export const logoutController = async (req, res) => {
   return res.send(success(200, "Logged out successfully"));
-}
-
-module.exports = {
-    loginController,
-    logoutController,
-    signupContorller
-}
+};

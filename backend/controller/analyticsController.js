@@ -1,25 +1,25 @@
-const expenseModel = require("../db/expenseModel");
-const { success, error } = require("../utils/handler");
-const mongoose = require("mongoose");
+import expenseModel from "../db/expenseModel.js";
+import { success, error } from "../utils/handler.js";
+import mongoose from "mongoose";
 
 // 1. category breakdown
-const getCategoryBreakdown = async (req, res) => {
+export const getCategoryBreakdown = async (req, res) => {
   try {
     const { userId, type = "expense" } = req.body;
 
     const data = await expenseModel.aggregate([
       {
         $match: {
-          userId: userId,
-          type
-        }
+          userId,
+          type,
+        },
       },
       {
         $group: {
           _id: "$category",
-          total: { $sum: "$amount" }
-        }
-      }
+          total: { $sum: "$amount" },
+        },
+      },
     ]);
 
     return res.send(success(200, data));
@@ -29,23 +29,23 @@ const getCategoryBreakdown = async (req, res) => {
 };
 
 // 2. monthly trend
-const getMonthlyTrend = async (req, res) => {
+export const getMonthlyTrend = async (req, res) => {
   try {
     const { userId } = req.body;
 
     const data = await expenseModel.aggregate([
       {
         $match: {
-          userId: userId
-        }
+          userId,
+        },
       },
       {
         $group: {
           _id: { $month: "$date" },
-          total: { $sum: "$amount" }
-        }
+          total: { $sum: "$amount" },
+        },
       },
-      { $sort: { "_id": 1 } }
+      { $sort: { _id: 1 } },
     ]);
 
     return res.send(success(200, data));
@@ -55,18 +55,18 @@ const getMonthlyTrend = async (req, res) => {
 };
 
 // 3. overview cards
-const getOverview = async (req, res) => {
+export const getOverview = async (req, res) => {
   try {
     const { userId } = req.body;
 
     const expenses = await expenseModel.aggregate([
       { $match: { userId, type: "expense" } },
-      { $group: { _id: null, total: { $sum: "$amount" } } }
+      { $group: { _id: null, total: { $sum: "$amount" } } },
     ]);
 
     const income = await expenseModel.aggregate([
       { $match: { userId, type: "income" } },
-      { $group: { _id: null, total: { $sum: "$amount" } } }
+      { $group: { _id: null, total: { $sum: "$amount" } } },
     ]);
 
     const totalExpense = expenses[0]?.total || 0;
@@ -76,15 +76,15 @@ const getOverview = async (req, res) => {
       success(200, {
         totalIncome,
         totalExpense,
-        savings: totalIncome - totalExpense
-      })
+        savings: totalIncome - totalExpense,
+      }),
     );
   } catch (e) {
     return res.send(error(500, e.message));
   }
 };
 
-const getSpendingInsights = async (req, res) => {
+export const getSpendingInsights = async (req, res) => {
   try {
     const { userId } = req.body;
 
@@ -96,15 +96,15 @@ const getSpendingInsights = async (req, res) => {
         $match: {
           userId,
           type: "expense",
-          $expr: { $eq: [{ $month: "$date" }, currentMonth] }
-        }
+          $expr: { $eq: [{ $month: "$date" }, currentMonth] },
+        },
       },
       {
         $group: {
           _id: null,
-          total: { $sum: "$amount" }
-        }
-      }
+          total: { $sum: "$amount" },
+        },
+      },
     ]);
 
     const previous = await expenseModel.aggregate([
@@ -112,15 +112,15 @@ const getSpendingInsights = async (req, res) => {
         $match: {
           userId,
           type: "expense",
-          $expr: { $eq: [{ $month: "$date" }, prevMonth] }
-        }
+          $expr: { $eq: [{ $month: "$date" }, prevMonth] },
+        },
       },
       {
         $group: {
           _id: null,
-          total: { $sum: "$amount" }
-        }
-      }
+          total: { $sum: "$amount" },
+        },
+      },
     ]);
 
     const currentTotal = current[0]?.total || 0;
@@ -145,15 +145,15 @@ const getSpendingInsights = async (req, res) => {
         currentTotal,
         previousTotal,
         percentageIncrease,
-        message
-      })
+        message,
+      }),
     );
   } catch (e) {
     return res.send(error(500, e.message));
   }
 };
 
-const predictNextMonthExpense = async (req, res) => {
+export const predictNextMonthExpense = async (req, res) => {
   try {
     const { userId } = req.body;
 
@@ -161,17 +161,17 @@ const predictNextMonthExpense = async (req, res) => {
       {
         $match: {
           userId: new mongoose.Types.ObjectId(userId),
-          type: "expense"
-        }
+          type: "expense",
+        },
       },
       {
         $group: {
           _id: { $month: "$date" },
-          total: { $sum: "$amount" }
-        }
+          total: { $sum: "$amount" },
+        },
       },
       { $sort: { _id: -1 } },
-      { $limit: 3 }
+      { $limit: 3 },
     ]);
 
     const avg =
@@ -181,18 +181,10 @@ const predictNextMonthExpense = async (req, res) => {
     return res.send(
       success(200, {
         last3Months,
-        predictedNextMonthExpense: Math.round(avg)
-      })
+        predictedNextMonthExpense: Math.round(avg),
+      }),
     );
   } catch (e) {
     return res.send(error(500, e.message));
   }
-};
-
-module.exports = {
-  getCategoryBreakdown,
-  getMonthlyTrend,
-  getOverview,
-  getSpendingInsights,
-  predictNextMonthExpense
 };
