@@ -46,7 +46,7 @@ const expenseSchema = new mongoose.Schema(
     },
     recurringType: {
       type: String,
-      enum: ["daily", "weekly", "monthly"],
+      enum: ["daily", "weekly", "monthly", null],
       default: null,
     },
     nextRecurringDate: {
