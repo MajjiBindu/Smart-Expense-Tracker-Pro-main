@@ -25,7 +25,7 @@ export const createExpense = async (expInfo) => {
     console.log(expInfo);
     const response = await axiosClient.post("/expenses/addExpense", expInfo);
     console.log(response.data);
-    if (response.data.statusCode !== 200) {
+    if (response.data.statusCode !== 201) {
       toast.error(`${response.data.message}`);
       return;
     }
@@ -43,7 +43,7 @@ export const deleteExpense = async (data) => {
       expenseId,
       userId,
     });
-    if (response.data.statusCode !== 201) {
+    if (response.data.statusCode !== 200) {
       toast.error(`${response.data.message}`);
       return;
     }

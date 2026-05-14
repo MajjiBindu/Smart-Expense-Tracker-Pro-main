@@ -25,6 +25,9 @@ export const updateSavings = async (req, res) => {
     const { goalId, amount } = req.body;
 
     const goal = await goalModel.findById(goalId);
+    if (!goal) {
+      return res.send(error(404, "Goal not found"));
+    }
     goal.savedAmount += amount;
     await goal.save();
 

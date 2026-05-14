@@ -14,7 +14,7 @@ const router = express.Router();
 
 router.post("/addExpense", createExpense);
 router.post("/deleteExpense", deleteExpense);
-router.get("/categoryExpense", getCategoryExpense);
+router.post("/categoryExpense", getCategoryExpense);
 router.post("/allExpenses", getAllExpenses);
 router.post("/sendEmail", emailSender);
 router.post("/summary", getSummary);

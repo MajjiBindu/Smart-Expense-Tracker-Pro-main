@@ -1,6 +1,5 @@
 import axios from "axios";
 
-
 export const axiosClient = axios.create({
-    baseURL : 'https://expensify-tracker.onrender.com'
+    baseURL : process.env.REACT_APP_API_URL || 'https://expensify-tracker.onrender.com'
 })

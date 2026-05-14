@@ -35,8 +35,8 @@ async function sendEmailWithAttachment(recipient, items) {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: "ldead4524@gmail.com",
-      pass: "cppqyjfnxyhrxkzq",
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
     },
   });
 
@@ -44,7 +44,7 @@ async function sendEmailWithAttachment(recipient, items) {
   const pdfContent = generatePDF(body);
 
   const mailOptions = {
-    from: "ldead4524@gmail.com",
+    from: process.env.EMAIL_USER,
     to: recipient,
     subject: "Expense Report for This Month",
     text: "Please find your expense report attached.",
@@ -55,6 +55,30 @@ async function sendEmailWithAttachment(recipient, items) {
         encoding: "base64",
       },
     ],
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email sent: " + info.response);
+  } catch (error) {
+    console.error("Error sending email:", error);
+  }
+}
+
+export async function sendPlainEmail(recipient, subject, text) {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: recipient,
+    subject,
+    text,
   };
 
   try {

@@ -24,14 +24,21 @@ const Home = () => {
   const [userexp, setUserexp] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Settings
-  const userSettings = JSON.parse(
-    localStorage.getItem(`user_settings_${userdata._id}`),
-  ) || {
-    monthlyBudget: 0,
-    currency: "INR",
-  };
+  // Settings — guard against null userdata
+  const userSettings = userdata
+    ? JSON.parse(
+        localStorage.getItem(`user_settings_${userdata._id}`),
+      ) || {
+        monthlyBudget: 0,
+        currency: "INR",
+      }
+    : { monthlyBudget: 0, currency: "INR" };
+
   useEffect(() => {
+    if (!userdata) {
+      navigate("/login");
+      return;
+    }
     if (!userSettings.monthlyBudget || userSettings.monthlyBudget === 0) {
       navigate("/settings");
     }
@@ -53,10 +60,14 @@ const Home = () => {
       return;
     }
 
-    const data = await getUserExpenses(userdata._id);
+    try {
+      const data = await getUserExpenses(userdata._id);
       setUserexp(data || []);
-
-    setTimeout(() => setIsLoading(false), 800); // Simulate realistic loading
+    } catch (err) {
+      console.error("Failed to fetch expenses:", err);
+    } finally {
+      setTimeout(() => setIsLoading(false), 800);
+    }
   };
 
   useEffect(() => {

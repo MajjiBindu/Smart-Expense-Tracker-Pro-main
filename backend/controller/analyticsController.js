@@ -10,7 +10,7 @@ export const getCategoryBreakdown = async (req, res) => {
     const data = await expenseModel.aggregate([
       {
         $match: {
-          userId,
+          userId: new mongoose.Types.ObjectId(userId),
           type,
         },
       },
@@ -36,7 +36,7 @@ export const getMonthlyTrend = async (req, res) => {
     const data = await expenseModel.aggregate([
       {
         $match: {
-          userId,
+          userId: new mongoose.Types.ObjectId(userId),
         },
       },
       {
@@ -60,12 +60,12 @@ export const getOverview = async (req, res) => {
     const { userId } = req.body;
 
     const expenses = await expenseModel.aggregate([
-      { $match: { userId, type: "expense" } },
+      { $match: { userId: new mongoose.Types.ObjectId(userId), type: "expense" } },
       { $group: { _id: null, total: { $sum: "$amount" } } },
     ]);
 
     const income = await expenseModel.aggregate([
-      { $match: { userId, type: "income" } },
+      { $match: { userId: new mongoose.Types.ObjectId(userId), type: "income" } },
       { $group: { _id: null, total: { $sum: "$amount" } } },
     ]);
 
@@ -94,7 +94,7 @@ export const getSpendingInsights = async (req, res) => {
     const current = await expenseModel.aggregate([
       {
         $match: {
-          userId,
+          userId: new mongoose.Types.ObjectId(userId),
           type: "expense",
           $expr: { $eq: [{ $month: "$date" }, currentMonth] },
         },
@@ -110,7 +110,7 @@ export const getSpendingInsights = async (req, res) => {
     const previous = await expenseModel.aggregate([
       {
         $match: {
-          userId,
+          userId: new mongoose.Types.ObjectId(userId),
           type: "expense",
           $expr: { $eq: [{ $month: "$date" }, prevMonth] },
         },

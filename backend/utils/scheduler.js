@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import userModel from "../db/userModel.js";
 import expenseModel from "../db/expenseModel.js";
 import Notification from "../db/notificationModel.js";
-import sendEmailWithAttachment from "./emailSend.js";
+import sendEmailWithAttachment, { sendPlainEmail } from "./emailSend.js";
 
 // ⏰ Smart reminder scheduler
 export const smartReminderScheduler = () => {
@@ -28,9 +28,10 @@ export const smartReminderScheduler = () => {
         if (settings.reminderTime !== currentTime) continue;
         if (settings.reminderType === "weekly" && day !== 0) continue;
 
-        await sendEmailWithAttachment(
+        await sendPlainEmail(
           user.email,
-          `Hi ${user.username || "User"}, don't forget to update today's expenses 💸`,
+          "Expense Reminder",
+          `Hi ${user.username || "User"}, don't forget to update today's expenses!`,
         );
       }
 
@@ -91,7 +92,7 @@ Top Spending Category: ${topCategory}
 Keep tracking and save smarter 💸
         `;
 
-        await sendEmailWithAttachment(user.email, mailBody);
+        await sendPlainEmail(user.email, "Monthly Expense Analysis", mailBody);
       }
 
       console.log("📩 Monthly analysis emails sent");

@@ -1,4 +1,5 @@
 import Notification from "../db/notificationModel.js";
+import { success, error } from "../utils/handler.js";
 
 export const updateSettings = async (req, res) => {
   try {
@@ -21,14 +22,8 @@ export const updateSettings = async (req, res) => {
       { upsert: true, new: true },
     );
 
-    res.status(200).json({
-      status: "success",
-      message: settings,
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: "failed",
-      message: error.message,
-    });
+    return res.send(success(200, settings));
+  } catch (err) {
+    return res.send(error(500, err.message));
   }
 };

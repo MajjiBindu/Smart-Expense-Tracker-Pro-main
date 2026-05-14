@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import expenseModel from "../db/expenseModel.js";
-import userModel from "../db/userModel.js";
 import sendEmailWithAttachment from "../utils/emailSend.js";
 import { error, success } from "../utils/handler.js";
 
@@ -62,7 +61,7 @@ export const getAllExpenses = async (req, res) => {
 
 export const getSummary = async (req, res) => {
   try {
-    const userId = req.body.userId || req.body.userId;
+    const { userId } = req.body;
 
     const expenses = await expenseModel.find({ userId });
 
@@ -92,7 +91,7 @@ export const getSummary = async (req, res) => {
 
 export const getRecentExpenses = async (req, res) => {
   try {
-    const userId = req.body.userId || req.body.userId;
+    const { userId } = req.body;
 
     const recent = await expenseModel
       .find({ userId })
@@ -115,7 +114,7 @@ export const getRecentExpenses = async (req, res) => {
 
 export const getCategoryExpense = async (req, res) => {
   try {
-    const userId = req.body.userId || req.body.userId;
+    const { userId } = req.body;
 
     const categoryData = await expenseModel.aggregate([
       {
@@ -140,7 +139,7 @@ export const getCategoryExpense = async (req, res) => {
 
 export const getMonthlyExpenses = async (req, res) => {
   try {
-    const userId = req.body.userId || req.body.userId;
+    const { userId } = req.body;
 
     const monthlyData = await expenseModel.aggregate([
       {

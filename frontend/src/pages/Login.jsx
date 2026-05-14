@@ -26,14 +26,24 @@ function Login() {
         password
       });
       
-      if(response.data.statusCode !== 201) {
+      if(response.data.statusCode !== 200) {
         toast.error(response.data.message);
         ref.current.complete();
         return;
       }
       
       toast.success("Successfully Logged In !!");
-      localStorage.setItem('User', JSON.stringify(response.data.message));
+      const userData = response.data.message;
+      localStorage.setItem('User', JSON.stringify(userData));
+
+      // Migrate budget settings saved during signup (keyed by email) to the _id key
+      const pendingKey = `user_settings_pending_${email.trim().toLowerCase()}`;
+      const pendingSettings = localStorage.getItem(pendingKey);
+      if (pendingSettings && !localStorage.getItem(`user_settings_${userData._id}`)) {
+        localStorage.setItem(`user_settings_${userData._id}`, pendingSettings);
+        localStorage.removeItem(pendingKey);
+      }
+
       ref.current.complete();
       navigate('/');
     } catch (error) {
