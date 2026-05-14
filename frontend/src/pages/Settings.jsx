@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
-import { getCurrentUserId } from "../utils/getCurrentUser";
 import { getUserStorageKey } from "../utils/storageHelper";
 
 const Settings = () => {
   const [user, setUser] = useState({ username: "User", email: "" });
-
-  // NEW: get userId
-
-  const userId = getCurrentUserId();
 
   const [settings, setSettings] = useState(() => {
     const saved = localStorage.getItem(getUserStorageKey("user_settings"));

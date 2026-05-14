@@ -38,7 +38,7 @@ const Home = () => {
     if (!userSettings.monthlyBudget || userSettings.monthlyBudget === 0) {
       navigate("/settings");
     }
-  }, []);
+  }, [navigate, userSettings]);
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -64,7 +64,7 @@ const Home = () => {
 
   useEffect(() => {
     fetchExpenses();
-  }, []);
+  }, [userdata]);
 
   const handleAddSubmit = async (e) => {
     e.preventDefault();
