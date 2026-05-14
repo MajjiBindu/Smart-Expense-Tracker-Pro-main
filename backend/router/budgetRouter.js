@@ -1,12 +1,14 @@
-const router = require("express").Router();
-const {
+import express from "express";
+import {
   createBudget,
   getBudgets,
   getBudgetStatus,
-} = require("../controller/budgetController");
+} from "../controller/budgetController.js";
+
+const router = express.Router();
 
 router.post("/create", createBudget);
 router.post("/all", getBudgets);
 router.post("/status", getBudgetStatus);
 
-module.exports = router;
+export default router;

@@ -1,12 +1,13 @@
-const router = require("express").Router();
-
-const {
+import express from "express";
+import {
   getCategoryBreakdown,
   getMonthlyTrend,
   getOverview,
   getSpendingInsights,
-  predictNextMonthExpense
-} = require("../controller/analyticsController");
+  predictNextMonthExpense,
+} from "../controller/analyticsController.js";
+
+const router = express.Router();
 
 router.post("/category-breakdown", getCategoryBreakdown);
 router.post("/monthly-trend", getMonthlyTrend);
@@ -14,4 +15,4 @@ router.post("/overview", getOverview);
 router.post("/insights", getSpendingInsights);
 router.post("/predict", predictNextMonthExpense);
 
-module.exports = router;
+export default router;

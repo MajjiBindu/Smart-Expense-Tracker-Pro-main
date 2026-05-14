@@ -1,7 +1,7 @@
-const goalModel = require("../db/goalModel");
-const { success, error } = require("../utils/handler");
+import goalModel from "../db/goalModel.js";
+import { success, error } from "../utils/handler.js";
 
-const createGoal = async (req, res) => {
+export const createGoal = async (req, res) => {
   try {
     const goal = await goalModel.create(req.body);
     return res.send(success(201, goal));
@@ -10,7 +10,7 @@ const createGoal = async (req, res) => {
   }
 };
 
-const getGoals = async (req, res) => {
+export const getGoals = async (req, res) => {
   try {
     const { userId } = req.body;
     const goals = await goalModel.find({ userId });
@@ -20,7 +20,7 @@ const getGoals = async (req, res) => {
   }
 };
 
-const updateSavings = async (req, res) => {
+export const updateSavings = async (req, res) => {
   try {
     const { goalId, amount } = req.body;
 
@@ -32,10 +32,4 @@ const updateSavings = async (req, res) => {
   } catch (e) {
     return res.send(error(500, e.message));
   }
-};
-
-module.exports = {
-  createGoal,
-  getGoals,
-  updateSavings
 };

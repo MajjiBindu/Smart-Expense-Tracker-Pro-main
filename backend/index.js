@@ -1,36 +1,40 @@
-const express = require('express');
-const cors = require('cors');
-require("dotenv").config();
-const connectDb = require('../backend/db/db');
-const userRouter = require('./router/userRouter');
-const expenseRouter = require('./router/expenseRouter');
-const budgetRouter = require("./router/budgetRouter");
-const goalRouter = require("./router/goalRouter");
-const analyticsRouter = require("./router/analyticsRouter");
-const notificationRouter = require("./router/notificationRouter");
-const app = express();
-const {
+import express from "express";
+import cors from "cors";
+import "dotenv/config";
+
+import connectDb from "../backend/db/db.js";
+import userRouter from "./router/userRouter.js";
+import expenseRouter from "./router/expenseRouter.js";
+import budgetRouter from "./router/budgetRouter.js";
+import goalRouter from "./router/goalRouter.js";
+import analyticsRouter from "./router/analyticsRouter.js";
+import notificationRouter from "./router/notificationRouter.js";
+import {
   smartReminderScheduler,
   monthlyAnalysisScheduler,
-  recurringTransactionScheduler
-} = require("./utils/scheduler");
+  recurringTransactionScheduler,
+} from "./utils/scheduler.js";
 
+const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use('/auth',userRouter)
-app.use('/analytics', analyticsRouter);
-app.use('/budgets', budgetRouter);
-app.use('/expenses',expenseRouter);
+
+app.use("/auth", userRouter);
+app.use("/analytics", analyticsRouter);
+app.use("/budgets", budgetRouter);
+app.use("/expenses", expenseRouter);
 app.use("/goals", goalRouter);
 app.use("/notifications", notificationRouter);
+
 connectDb();
 
 smartReminderScheduler();
 monthlyAnalysisScheduler();
 recurringTransactionScheduler();
 
-const port = 4000 || process.env.PORT_NO ;
-app.listen(port , ()=>{
-        console.log(`Server on :- ${port}`);
-})
+const port = process.env.PORT_NO || 4000;
+
+app.listen(port, () => {
+  console.log(`Server on :- ${port}`);
+});

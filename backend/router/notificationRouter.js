@@ -1,6 +1,8 @@
-const router = require("express").Router();
-const { updateSettings } = require("../controller/notificationController");
+import express from "express";
+import { updateSettings } from "../controller/notificationController.js";
+
+const router = express.Router();
 
 router.post("/settings", updateSettings);
 
-module.exports = router;
+export default router;

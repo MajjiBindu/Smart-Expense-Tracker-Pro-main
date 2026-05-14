@@ -1,41 +1,36 @@
-const cron = require("node-cron");
-const mongoose = require("mongoose");
+import cron from "node-cron";
+import mongoose from "mongoose";
 
-const userModel = require("../db/userModel");
-const expenseModel = require("../db/expenseModel");
-const Notification = require("../db/notificationModel");
-const sendEmailWithAttachment = require("./emailSend");
+import userModel from "../db/userModel.js";
+import expenseModel from "../db/expenseModel.js";
+import Notification from "../db/notificationModel.js";
+import sendEmailWithAttachment from "./emailSend.js";
 
 // ⏰ Smart reminder scheduler
-const smartReminderScheduler = () => {
+export const smartReminderScheduler = () => {
   cron.schedule("* * * * *", async () => {
     try {
       const users = await userModel.find();
 
       const now = new Date();
       const currentTime = `${String(now.getHours()).padStart(2, "0")}:${String(
-        now.getMinutes()
+        now.getMinutes(),
       ).padStart(2, "0")}`;
 
-      const day = now.getDay(); // 0 = Sunday
+      const day = now.getDay();
 
       for (const user of users) {
         const settings = await Notification.findOne({
-          userId: user._id
+          userId: user._id,
         });
 
-        // if no settings or disabled → skip
         if (!settings || !settings.reminderEnabled) continue;
-
-        // time must match exactly
         if (settings.reminderTime !== currentTime) continue;
-
-        // weekly reminder only on Sunday
         if (settings.reminderType === "weekly" && day !== 0) continue;
 
         await sendEmailWithAttachment(
           user.email,
-          `Hi ${user.username || "User"}, don't forget to update today's expenses 💸`
+          `Hi ${user.username || "User"}, don't forget to update today's expenses 💸`,
         );
       }
 
@@ -47,47 +42,44 @@ const smartReminderScheduler = () => {
 };
 
 // 📅 Monthly analysis email scheduler
-const monthlyAnalysisScheduler = () => {
+export const monthlyAnalysisScheduler = () => {
   cron.schedule("59 23 28-31 * *", async () => {
     try {
       const today = new Date();
       const tomorrow = new Date(today);
       tomorrow.setDate(today.getDate() + 1);
 
-      // only run on actual last day of month
       if (tomorrow.getDate() !== 1) return;
 
       const users = await userModel.find();
 
       for (const user of users) {
         const settings = await Notification.findOne({
-          userId: user._id
+          userId: user._id,
         });
 
-        // if settings exist and monthly disabled → skip
         if (settings && !settings.monthlyReportEnabled) continue;
 
         const expenses = await expenseModel.aggregate([
           {
             $match: {
               userId: new mongoose.Types.ObjectId(user._id),
-              type: "expense"
-            }
+              type: "expense",
+            },
           },
           {
             $group: {
               _id: "$category",
-              total: { $sum: "$amount" }
-            }
+              total: { $sum: "$amount" },
+            },
           },
-          { $sort: { total: -1 } }
+          { $sort: { total: -1 } },
         ]);
 
         const totalExpense = expenses.reduce(
           (sum, item) => sum + item.total,
-          0
+          0,
         );
-
         const topCategory = expenses[0]?._id || "No data";
 
         const mailBody = `
@@ -109,7 +101,7 @@ Keep tracking and save smarter 💸
   });
 };
 
-const recurringTransactionScheduler = () => {
+export const recurringTransactionScheduler = () => {
   cron.schedule("0 0 * * *", async () => {
     try {
       const today = new Date();
@@ -117,7 +109,7 @@ const recurringTransactionScheduler = () => {
 
       const recurringExpenses = await expenseModel.find({
         isRecurring: true,
-        nextRecurringDate: { $lte: today }
+        nextRecurringDate: { $lte: today },
       });
 
       for (const expense of recurringExpenses) {
@@ -131,10 +123,9 @@ const recurringTransactionScheduler = () => {
           paymentMethod: expense.paymentMethod,
           note: expense.note,
           isRecurring: true,
-          recurringType: expense.recurringType
+          recurringType: expense.recurringType,
         });
 
-        // update next recurring date
         let nextDate = new Date(today);
 
         if (expense.recurringType === "daily") {
@@ -154,11 +145,4 @@ const recurringTransactionScheduler = () => {
       console.log("Recurring scheduler error:", err.message);
     }
   });
-};
-
-
-module.exports = {
-  smartReminderScheduler,
-  monthlyAnalysisScheduler,
-  recurringTransactionScheduler
 };

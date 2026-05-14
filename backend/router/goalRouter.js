@@ -1,12 +1,14 @@
-const router = require("express").Router();
-const {
+import express from "express";
+import {
   createGoal,
   getGoals,
-  updateSavings
-} = require("../controller/goalController");
+  updateSavings,
+} from "../controller/goalController.js";
+
+const router = express.Router();
 
 router.post("/create", createGoal);
 router.post("/all", getGoals);
 router.post("/save", updateSavings);
 
-module.exports = router;
+export default router;

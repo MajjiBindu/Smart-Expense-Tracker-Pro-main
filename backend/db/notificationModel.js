@@ -1,29 +1,37 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-const notificationSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "users",
-    required: true,
-    unique: true
+const notificationSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
+      required: true,
+      unique: true,
+    },
+    reminderEnabled: {
+      type: Boolean,
+      default: true,
+    },
+    reminderType: {
+      type: String,
+      enum: ["daily", "weekly"],
+      default: "daily",
+    },
+    reminderTime: {
+      type: String,
+      default: "21:00",
+    },
+    monthlyReportEnabled: {
+      type: Boolean,
+      default: true,
+    },
   },
-  reminderEnabled: {
-    type: Boolean,
-    default: true
-  },
-  reminderType: {
-    type: String,
-    enum: ["daily", "weekly"],
-    default: "daily"
-  },
-  reminderTime: {
-    type: String,
-    default: "21:00"
-  },
-  monthlyReportEnabled: {
-    type: Boolean,
-    default: true
-  }
-}, { timestamps: true });
+  { timestamps: true },
+);
 
-module.exports = mongoose.model("notificationSettings", notificationSchema);
+const notificationModel = mongoose.model(
+  "notificationSettings",
+  notificationSchema,
+);
+
+export default notificationModel;

@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const budgetSchema = new mongoose.Schema(
   {
@@ -20,7 +20,9 @@ const budgetSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-module.exports = mongoose.model("budgets", budgetSchema);
+const budgetModel = mongoose.model("budgets", budgetSchema);
+
+export default budgetModel;

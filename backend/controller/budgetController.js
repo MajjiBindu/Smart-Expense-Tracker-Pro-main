@@ -1,8 +1,9 @@
-const budgetModel = require("../db/budgetModel");
-const expenseModel = require("../db/expenseModel");
-const { success, error } = require("../utils/handler");
+import mongoose from "mongoose";
+import budgetModel from "../db/budgetModel.js";
+import expenseModel from "../db/expenseModel.js";
+import { success, error } from "../utils/handler.js";
 
-const createBudget = async (req, res) => {
+export const createBudget = async (req, res) => {
   try {
     const budget = await budgetModel.create(req.body);
     return res.send(success(201, budget));
@@ -11,7 +12,7 @@ const createBudget = async (req, res) => {
   }
 };
 
-const getBudgets = async (req, res) => {
+export const getBudgets = async (req, res) => {
   try {
     const { userId } = req.body;
     const budgets = await budgetModel.find({ userId });
@@ -21,7 +22,7 @@ const getBudgets = async (req, res) => {
   }
 };
 
-const getBudgetStatus = async (req, res) => {
+export const getBudgetStatus = async (req, res) => {
   try {
     const { userId, category } = req.body;
 
@@ -30,7 +31,7 @@ const getBudgetStatus = async (req, res) => {
     const spent = await expenseModel.aggregate([
       {
         $match: {
-          userId: new require("mongoose").Types.ObjectId(userId),
+          userId: new mongoose.Types.ObjectId(userId),
           category,
           type: "expense",
         },
@@ -50,15 +51,9 @@ const getBudgetStatus = async (req, res) => {
         limit: budget?.limit || 0,
         spent: totalSpent,
         remaining: (budget?.limit || 0) - totalSpent,
-      })
+      }),
     );
   } catch (err) {
     return res.send(error(500, err.message));
   }
-};
-
-module.exports = {
-  createBudget,
-  getBudgets,
-  getBudgetStatus,
 };

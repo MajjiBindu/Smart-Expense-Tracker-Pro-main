@@ -1,9 +1,10 @@
-const expenseModel = require("../db/expenseModel");
-const userModel = require("../db/userModel");
-const sendEmailWithAttachment = require("../utils/emailSend");
-const { error, success } = require("../utils/handler");
+import mongoose from "mongoose";
+import expenseModel from "../db/expenseModel.js";
+import userModel from "../db/userModel.js";
+import sendEmailWithAttachment from "../utils/emailSend.js";
+import { error, success } from "../utils/handler.js";
 
-const createExpense = async (req, res) => {
+export const createExpense = async (req, res) => {
   try {
     let { amount, category, date, userId, title, type, paymentMethod, note } =
       req.body;
@@ -31,7 +32,7 @@ const createExpense = async (req, res) => {
   }
 };
 
-const deleteExpense = async (req, res) => {
+export const deleteExpense = async (req, res) => {
   try {
     const { expenseId } = req.body;
 
@@ -43,7 +44,7 @@ const deleteExpense = async (req, res) => {
   }
 };
 
-const getAllExpenses = async (req, res) => {
+export const getAllExpenses = async (req, res) => {
   try {
     const { userId } = req.body;
 
@@ -51,9 +52,7 @@ const getAllExpenses = async (req, res) => {
       return res.send(error(400, "UserId is required"));
     }
 
-    const expenses = await expenseModel
-      .find({ userId: userId })
-      .sort({ date: -1 });
+    const expenses = await expenseModel.find({ userId }).sort({ date: -1 });
 
     return res.send(success(200, expenses));
   } catch (e) {
@@ -61,7 +60,7 @@ const getAllExpenses = async (req, res) => {
   }
 };
 
-const getSummary = async (req, res) => {
+export const getSummary = async (req, res) => {
   try {
     const userId = req.body.userId || req.body.userId;
 
@@ -91,7 +90,7 @@ const getSummary = async (req, res) => {
   }
 };
 
-const getRecentExpenses = async (req, res) => {
+export const getRecentExpenses = async (req, res) => {
   try {
     const userId = req.body.userId || req.body.userId;
 
@@ -114,14 +113,14 @@ const getRecentExpenses = async (req, res) => {
     }
 }*/
 
-const getCategoryExpense = async (req, res) => {
+export const getCategoryExpense = async (req, res) => {
   try {
     const userId = req.body.userId || req.body.userId;
 
     const categoryData = await expenseModel.aggregate([
       {
         $match: {
-          userId: new require("mongoose").Types.ObjectId(userId),
+          userId: new mongoose.Types.ObjectId(userId),
           type: "expense",
         },
       },
@@ -139,14 +138,14 @@ const getCategoryExpense = async (req, res) => {
   }
 };
 
-const getMonthlyExpenses = async (req, res) => {
+export const getMonthlyExpenses = async (req, res) => {
   try {
     const userId = req.body.userId || req.body.userId;
 
     const monthlyData = await expenseModel.aggregate([
       {
         $match: {
-          userId: new require("mongoose").Types.ObjectId(userId),
+          userId: new mongoose.Types.ObjectId(userId),
           type: "expense",
         },
       },
@@ -167,23 +166,12 @@ const getMonthlyExpenses = async (req, res) => {
   }
 };
 
-const emailSender = (req, res) => {
+export const emailSender = (req, res) => {
   try {
     const { recipient, body } = req.body;
     sendEmailWithAttachment(recipient, body);
     return res.send(success(201, "Email Sent"));
-  } catch (error) {
+  } catch (err) {
     return res.send(error(401, "Email Is Wrong"));
   }
-};
-
-module.exports = {
-  createExpense,
-  deleteExpense,
-  getCategoryExpense,
-  getAllExpenses,
-  getSummary,
-  getRecentExpenses,
-  getMonthlyExpenses,
-  emailSender,
 };
