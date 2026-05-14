@@ -68,6 +68,7 @@ const MonthlyExpenseChart = ({ exdata }) => {
   const options = {
     responsive: true,
     maintainAspectRatio: false,
+    backgroundColor: '#0F172A', // Dark background for visibility
     plugins: {
       legend: {
         display: false, // hide legend for this simple bar chart

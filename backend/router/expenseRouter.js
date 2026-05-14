@@ -9,8 +9,11 @@ import {
   getMonthlyExpenses,
   emailSender,
 } from "../controller/expenseController.js";
+import { verifyToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
+
+router.use(verifyToken);
 
 router.post("/addExpense", createExpense);
 router.post("/deleteExpense", deleteExpense);

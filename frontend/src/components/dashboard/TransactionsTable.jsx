@@ -5,9 +5,7 @@ import Modal from "../ui/Modal";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-const TransactionsTable = ({ transactions, onUpdate }) => {
-  // State for advanced features
-  const [searchQuery, setSearchQuery] = useState("");
+const TransactionsTable = ({ transactions, onUpdate, search }) => {
   const [filterCategory, setFilterCategory] = useState("");
   const [filterDate, setFilterDate] = useState(null);
   const [sortBy, setSortBy] = useState("latest"); // latest, oldest, highest, lowest
@@ -38,13 +36,22 @@ const TransactionsTable = ({ transactions, onUpdate }) => {
   const processedData = useMemo(() => {
     let result = transactions ? [...transactions] : [];
 
-    // Search
-    if (searchQuery) {
-      result = result.filter(
-        (tx) =>
-          tx.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          tx.amount.toString().includes(searchQuery),
-      );
+    // Enhanced Search: category, title/note, amount (exact or range)
+    if (search && search.trim() !== "") {
+      const s = search.trim().toLowerCase();
+      // Amount range: e.g. 100-200
+      const rangeMatch = s.match(/^(\d+)[-–](\d+)$/);
+      result = result.filter((tx) => {
+        const cat = tx.category?.toLowerCase() || "";
+        const note = tx.note?.toLowerCase() || tx.title?.toLowerCase() || "";
+        const amt = tx.amount;
+        if (rangeMatch) {
+          const min = parseFloat(rangeMatch[1]);
+          const max = parseFloat(rangeMatch[2]);
+          return amt >= min && amt <= max;
+        }
+        return cat.includes(s) || note.includes(s) || amt.toString() === s;
+      });
     }
     // Filter Category
     if (filterCategory) {
@@ -74,7 +81,7 @@ const TransactionsTable = ({ transactions, onUpdate }) => {
     });
 
     return result;
-  }, [transactions, searchQuery, filterCategory, filterDate, sortBy]);
+  }, [transactions, search, filterCategory, filterDate, sortBy]);
 
   // Pagination
   const totalPages = Math.ceil(processedData.length / itemsPerPage);
@@ -167,16 +174,7 @@ const TransactionsTable = ({ transactions, onUpdate }) => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <input
-            type="text"
-            placeholder="Search by category or amount..."
-            className="premium-input text-sm h-10"
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setCurrentPage(1);
-            }}
-          />
+          {/* Search input removed, now handled by TopNavbar */}
           <select
             className="premium-input text-sm h-10 cursor-pointer text-slate-300"
             value={filterCategory}

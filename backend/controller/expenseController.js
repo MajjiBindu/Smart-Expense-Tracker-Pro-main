@@ -6,63 +6,82 @@ import { error, success } from "../utils/handler.js";
 
 export const createExpense = async (req, res) => {
   try {
-    let { amount, category, date, userId, title, type, paymentMethod, note } =
-      req.body;
+    let { amount, category, date, title, type, paymentMethod, note } = req.body;
 
-    const finalUserId = userId;
+    const userId = req.user.userId;
 
-    if (!amount || !category || !date || !finalUserId) {
-      return res.send(error(400, "Required fields missing"));
+    if (!amount || !category || !date || !userId) {
+      const response = error(400, "Required fields missing");
+      return res.status(response.statusCode).send(response);
     }
 
     const newExpense = await expenseModel.create({
       amount,
       category,
       date,
-      userId: finalUserId,
+      userId,
       title: title || category,
       type: type || "expense",
       paymentMethod: paymentMethod || "UPI",
       note: note || "",
     });
 
-    return res.send(success(201, newExpense));
+    const response = success(201, newExpense);
+    return res.status(response.statusCode).send(response);
   } catch (e) {
-    return res.send(error(500, e.message));
+    const response = error(500, e.message);
+    return res.status(response.statusCode).send(response);
   }
 };
 
 export const deleteExpense = async (req, res) => {
   try {
     const { expenseId } = req.body;
+    const userId = req.user.userId;
+
+    if (!expenseId) {
+      const response = error(400, "ExpenseId required");
+      return res.status(response.statusCode).send(response);
+    }
+
+    const expense = await expenseModel.findById(expenseId);
+    if (!expense) {
+      const response = error(404, "Expense not found");
+      return res.status(response.statusCode).send(response);
+    }
+
+    // Additional ownership check (middleware already verifies)
+    if (expense.userId.toString() !== userId.toString()) {
+      const response = error(403, "Unauthorized: userId does not match");
+      return res.status(response.statusCode).send(response);
+    }
 
     await expenseModel.findByIdAndDelete(expenseId);
-
-    return res.send(success(200, "Expense deleted"));
+    const response = success(200, "Expense deleted");
+    return res.status(response.statusCode).send(response);
   } catch (e) {
-    return res.send(error(500, e.message));
+    const response = error(500, e.message);
+    return res.status(response.statusCode).send(response);
   }
 };
 
 export const getAllExpenses = async (req, res) => {
   try {
-    const { userId } = req.body;
-
-    if (!userId) {
-      return res.send(error(400, "UserId is required"));
-    }
+    const userId = req.user.userId;
 
     const expenses = await expenseModel.find({ userId }).sort({ date: -1 });
 
-    return res.send(success(200, expenses));
+    const response = success(200, expenses);
+    return res.status(response.statusCode).send(response);
   } catch (e) {
-    return res.send(error(500, e.message));
+    const response = error(500, e.message);
+    return res.status(response.statusCode).send(response);
   }
 };
 
 export const getSummary = async (req, res) => {
   try {
-    const userId = req.body.userId || req.body.userId;
+    const userId = req.user.userId;
 
     const expenses = await expenseModel.find({ userId });
 
@@ -77,45 +96,39 @@ export const getSummary = async (req, res) => {
       }
     });
 
-    return res.send(
-      success(200, {
-        totalIncome,
-        totalExpense,
-        balance: totalIncome - totalExpense,
-        totalTransactions: expenses.length,
-      }),
-    );
+    const response = success(200, {
+      totalIncome,
+      totalExpense,
+      balance: totalIncome - totalExpense,
+      totalTransactions: expenses.length,
+    });
+    return res.status(response.statusCode).send(response);
   } catch (e) {
-    return res.send(error(500, e.message));
+    const response = error(500, e.message);
+    return res.status(response.statusCode).send(response);
   }
 };
 
 export const getRecentExpenses = async (req, res) => {
   try {
-    const userId = req.body.userId || req.body.userId;
+    const userId = req.user.userId;
 
     const recent = await expenseModel
       .find({ userId })
       .sort({ createdAt: -1 })
       .limit(5);
 
-    return res.send(success(200, recent));
+    const response = success(200, recent);
+    return res.status(response.statusCode).send(response);
   } catch (e) {
-    return res.send(error(500, e.message));
+    const response = error(500, e.message);
+    return res.status(response.statusCode).send(response);
   }
 };
 
-/*const getCategoryExpense = async (req,res)=>{
-    try {
-        
-    } catch (e) {
-        return res.send(error(401,e.message))
-    }
-}*/
-
 export const getCategoryExpense = async (req, res) => {
   try {
-    const userId = req.body.userId || req.body.userId;
+    const userId = req.user.userId;
 
     const categoryData = await expenseModel.aggregate([
       {
@@ -132,15 +145,17 @@ export const getCategoryExpense = async (req, res) => {
       },
     ]);
 
-    return res.send(success(200, categoryData));
+    const response = success(200, categoryData);
+    return res.status(response.statusCode).send(response);
   } catch (e) {
-    return res.send(error(500, e.message));
+    const response = error(500, e.message);
+    return res.status(response.statusCode).send(response);
   }
 };
 
 export const getMonthlyExpenses = async (req, res) => {
   try {
-    const userId = req.body.userId || req.body.userId;
+    const userId = req.user.userId;
 
     const monthlyData = await expenseModel.aggregate([
       {
@@ -160,9 +175,11 @@ export const getMonthlyExpenses = async (req, res) => {
       },
     ]);
 
-    return res.send(success(200, monthlyData));
+    const response = success(200, monthlyData);
+    return res.status(response.statusCode).send(response);
   } catch (e) {
-    return res.send(error(500, e.message));
+    const response = error(500, e.message);
+    return res.status(response.statusCode).send(response);
   }
 };
 
@@ -170,8 +187,10 @@ export const emailSender = (req, res) => {
   try {
     const { recipient, body } = req.body;
     sendEmailWithAttachment(recipient, body);
-    return res.send(success(201, "Email Sent"));
+    const response = success(201, "Email Sent");
+    return res.status(response.statusCode).send(response);
   } catch (err) {
-    return res.send(error(401, "Email Is Wrong"));
+    const response = error(401, "Email Is Wrong");
+    return res.status(response.statusCode).send(response);
   }
 };

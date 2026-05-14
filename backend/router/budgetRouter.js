@@ -4,8 +4,11 @@ import {
   getBudgets,
   getBudgetStatus,
 } from "../controller/budgetController.js";
+import { verifyToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
+
+router.use(verifyToken);
 
 router.post("/create", createBudget);
 router.post("/all", getBudgets);

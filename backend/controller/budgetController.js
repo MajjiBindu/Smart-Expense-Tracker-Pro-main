@@ -5,26 +5,34 @@ import { success, error } from "../utils/handler.js";
 
 export const createBudget = async (req, res) => {
   try {
-    const budget = await budgetModel.create(req.body);
-    return res.send(success(201, budget));
+    const { category, limit } = req.body;
+    const userId = req.user.userId;
+
+    const budget = await budgetModel.create({ userId, category, limit });
+    const response = success(201, budget);
+    return res.status(response.statusCode).send(response);
   } catch (err) {
-    return res.send(error(500, err.message));
+    const response = error(500, err.message);
+    return res.status(response.statusCode).send(response);
   }
 };
 
 export const getBudgets = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const userId = req.user.userId;
     const budgets = await budgetModel.find({ userId });
-    return res.send(success(200, budgets));
+    const response = success(200, budgets);
+    return res.status(response.statusCode).send(response);
   } catch (err) {
-    return res.send(error(500, err.message));
+    const response = error(500, err.message);
+    return res.status(response.statusCode).send(response);
   }
 };
 
 export const getBudgetStatus = async (req, res) => {
   try {
-    const { userId, category } = req.body;
+    const { category } = req.body;
+    const userId = req.user.userId;
 
     const budget = await budgetModel.findOne({ userId, category });
 
@@ -46,14 +54,14 @@ export const getBudgetStatus = async (req, res) => {
 
     const totalSpent = spent[0]?.total || 0;
 
-    return res.send(
-      success(200, {
-        limit: budget?.limit || 0,
-        spent: totalSpent,
-        remaining: (budget?.limit || 0) - totalSpent,
-      }),
-    );
+    const response = success(200, {
+      limit: budget?.limit || 0,
+      spent: totalSpent,
+      remaining: (budget?.limit || 0) - totalSpent,
+    });
+    return res.status(response.statusCode).send(response);
   } catch (err) {
-    return res.send(error(500, err.message));
+    const response = error(500, err.message);
+    return res.status(response.statusCode).send(response);
   }
 };

@@ -10,7 +10,7 @@ export const getUserExpenses = async (userId) => {
     // records.sort((a, b) => {
     //     return new Date(a.order_date) - new Date(b.order_date); // descending
     //   })
-    const exp = response.data.message.sort((a, b) => {
+    const exp = (response.data.message || []).sort((a, b) => {
       return new Date(b.date) - new Date(a.date);
     });
     // console.log(exp)

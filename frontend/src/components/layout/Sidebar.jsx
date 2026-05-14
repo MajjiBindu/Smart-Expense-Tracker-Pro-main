@@ -9,14 +9,14 @@ import {
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
   const navItems = [
-    { name: "Dashboard", path: "/", icon: <MdDashboard size={24} /> },
+    { name: "Dashboard", path: "/", icon: <MdDashboard size={28} /> },
     {
       name: "Recurring",
       path: "/recurring",
-      icon: <MdAccountBalanceWallet size={24} />,
+      icon: <MdAccountBalanceWallet size={28} />,
     },
-    { name: "Analytics", path: "/analytics", icon: <MdPieChart size={24} /> },
-    { name: "Settings", path: "/settings", icon: <MdSettings size={24} /> },
+    { name: "Analytics", path: "/analytics", icon: <MdPieChart size={28} /> },
+    { name: "Settings", path: "/settings", icon: <MdSettings size={28} /> },
   ];
 
   return (
@@ -49,7 +49,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
               className={({ isActive }) =>
                 `flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 group ${
                   isActive
-                    ? "bg-brand-primary/20 text-brand-primary border border-brand-primary/30 shadow-[0_0_15px_rgba(99,102,241,0.2)]"
+                    ? "bg-brand-primary/30 text-brand-primary border-2 border-brand-primary shadow-[0_0_25px_rgba(99,102,241,0.6)]"
                     : "text-slate-400 hover:bg-white/5 hover:text-white"
                 }`
               }

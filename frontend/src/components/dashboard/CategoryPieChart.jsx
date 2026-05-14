@@ -20,7 +20,7 @@ export function CategoryPieChart({ exdata }) {
           'rgba(96, 165, 250, 0.7)',  // Blue
           'rgba(192, 132, 252, 0.7)', // Purple
           'rgba(129, 140, 248, 0.7)', // Indigo
-          'rgba(2fb, 113, 133, 0.7)', // Rose
+          'rgba(251, 113, 133, 0.7)', // Rose color fixed
           'rgba(52, 211, 153, 0.7)',  // Emerald
           'rgba(148, 163, 184, 0.7)', // Slate
         ],

@@ -1,6 +1,11 @@
 import userModel from "../db/userModel.js";
 import { error, success } from "../utils/handler.js";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+
+const generateToken = (userId) => {
+  return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
+};
 
 export const loginController = async (req, res) => {
   try {
@@ -11,24 +16,31 @@ export const loginController = async (req, res) => {
     });
 
     if (!user) {
-      return res.send(error(404, "User not found"));
+      const response = error(404, "User not found");
+      return res.status(response.statusCode).send(response);
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return res.send(error(401, "Invalid credentials"));
+      const response = error(401, "Invalid credentials");
+      return res.status(response.statusCode).send(response);
     }
+
+    const token = generateToken(user._id);
 
     const userData = {
       _id: user._id,
       username: user.username,
       email: user.email,
+      token,
     };
 
-    return res.send(success(200, userData));
+    const response = success(200, userData);
+    return res.status(response.statusCode).send(response);
   } catch (err) {
-    return res.send(error(500, err.message));
+    const response = error(500, err.message);
+    return res.status(response.statusCode).send(response);
   }
 };
 
@@ -41,23 +53,32 @@ export const signupContorller = async (req, res) => {
     const existingUser = await userModel.findOne({ email: normalizedEmail });
 
     if (existingUser) {
-      return res.send(error(409, "User already exists"));
+      const response = error(409, "User already exists");
+      return res.status(response.statusCode).send(response);
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await userModel.create({
+    const newUser = await userModel.create({
       username,
       email: normalizedEmail,
       password: hashedPassword,
     });
 
-    return res.send(success(201, "User created successfully"));
+    const token = generateToken(newUser._id);
+
+    const response = success(201, {
+      message: "User created successfully",
+      token,
+    });
+    return res.status(response.statusCode).send(response);
   } catch (err) {
-    return res.send(error(500, err.message));
+    const response = error(500, err.message);
+    return res.status(response.statusCode).send(response);
   }
 };
 
 export const logoutController = async (req, res) => {
-  return res.send(success(200, "Logged out successfully"));
+  const response = success(200, "Logged out successfully");
+  return res.status(response.statusCode).send(response);
 };

@@ -18,11 +18,14 @@ import {
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
+import TopNavbar from "../components/layout/TopNavbar";
 const Home = () => {
   const navigate = useNavigate();
   const [userdata] = useState(() => JSON.parse(localStorage.getItem("User")));
   const [userexp, setUserexp] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  // Search state for transactions
+  const [search, setSearch] = useState("");
 
   // Settings
   const userSettings = JSON.parse(
@@ -54,7 +57,7 @@ const Home = () => {
     }
 
     const data = await getUserExpenses(userdata._id);
-      setUserexp(data || []);
+    setUserexp(data || []);
 
     setTimeout(() => setIsLoading(false), 800); // Simulate realistic loading
   };
@@ -105,6 +108,12 @@ const Home = () => {
 
   return (
     <div className="w-full space-y-6 sm:space-y-8 animate-fade-in-up">
+      {/* Top Navbar with search */}
+      <TopNavbar
+        setIsSidebarOpen={() => {}}
+        search={search}
+        setSearch={setSearch}
+      />
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -139,16 +148,19 @@ const Home = () => {
                 title="Monthly Budget"
                 amount={userSettings.monthlyBudget}
                 type="neutral"
+                tendency={0}
               />
               <StatCard
                 title="Total Spent"
                 amount={totalSpent}
                 type="warning"
+                tendency={0}
               />
               <StatCard
                 title="Remaining"
                 amount={remainingBudget > 0 ? remainingBudget : 0}
-                type={remainingBudget < 0 ? "warning" : "success"}
+                type="success"
+                tendency={0}
               />
             </>
           )}
@@ -232,6 +244,7 @@ const Home = () => {
             <TransactionsTable
               transactions={userexp}
               onUpdate={fetchExpenses}
+              search={search}
             />
           )}
         </div>
