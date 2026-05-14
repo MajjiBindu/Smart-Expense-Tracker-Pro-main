@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import "dotenv/config";
 
-import connectDb from "../backend/db/db.js";
+import connectDb from "./db/db.js";
 import userRouter from "./router/userRouter.js";
 import expenseRouter from "./router/expenseRouter.js";
 import budgetRouter from "./router/budgetRouter.js";
@@ -32,14 +32,20 @@ app.use("/expenses", expenseRouter);
 app.use("/goals", goalRouter);
 app.use("/notifications", notificationRouter);
 
-connectDb();
-
-smartReminderScheduler();
-monthlyAnalysisScheduler();
-recurringTransactionScheduler();
-
 const port = process.env.PORT_NO || 4000;
 
 app.listen(port, () => {
   console.log(`Server on :- ${port}`);
+});
+
+connectDb().then(() => {
+  try {
+    smartReminderScheduler();
+    monthlyAnalysisScheduler();
+    recurringTransactionScheduler();
+  } catch (err) {
+    console.error("Scheduler init error:", err.message);
+  }
+}).catch((err) => {
+  console.error("DB startup error:", err.message);
 });

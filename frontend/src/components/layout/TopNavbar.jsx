@@ -6,7 +6,7 @@ import {
   HiOutlineBell,
   HiOutlineSearch,
 } from "react-icons/hi";
-import { FiLogOut, FiSettings } from "react-icons/fi";
+import { FiLogOut } from "react-icons/fi";
 import { MdCheckCircle, MdWarning, MdInfoOutline } from "react-icons/md";
 import LoadingBar from "react-top-loading-bar";
 

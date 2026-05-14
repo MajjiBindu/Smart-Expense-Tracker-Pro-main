@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getUserExpenses, createExpense } from "../utils/renders";
 import StatCard from "../components/dashboard/StatCard";
@@ -28,12 +28,12 @@ const Home = () => {
   const [search, setSearch] = useState("");
 
   // Settings
-  const userSettings = JSON.parse(
+  const userSettings = useMemo(() => JSON.parse(
     localStorage.getItem(`user_settings_${userdata._id}`),
   ) || {
     monthlyBudget: 0,
     currency: "INR",
-  };
+  }, [userdata]);
   useEffect(() => {
     if (!userSettings.monthlyBudget || userSettings.monthlyBudget === 0) {
       navigate("/settings");
@@ -48,7 +48,7 @@ const Home = () => {
     date: new Date(),
   });
 
-  const fetchExpenses = async () => {
+  const fetchExpenses = useCallback(async () => {
     setIsLoading(true);
 
     if (!userdata) {
@@ -60,11 +60,11 @@ const Home = () => {
     setUserexp(data || []);
 
     setTimeout(() => setIsLoading(false), 800); // Simulate realistic loading
-  };
+  }, [userdata, navigate]);
 
   useEffect(() => {
     fetchExpenses();
-  }, [userdata]);
+  }, [fetchExpenses]);
 
   const handleAddSubmit = async (e) => {
     e.preventDefault();
